@@ -1,6 +1,21 @@
 from PyQt5.QtCore import Qt
 
 def back_to_menu(self):
+    # Check for death before returning to menu
+    if self.selected_pet and (self.selected_pet._hunger == 0 or self.selected_pet._health == 0):
+        self.selected_pet._status = "Your pet died."
+        self.pet_dead = True
+        # Clear all other text/screens
+        self.screen_states = {k: False for k in self.screen_states}
+        self.texts = {k: "" for k in self.texts}
+        self.texts["dead"] = self.selected_pet._status
+        self.sound_manager.play("death")
+        self.buttonA.setEnabled(False)
+        self.buttonB.setEnabled(False)
+        self.buttonC.setEnabled(False)
+        self.update()
+        return
+    # Normal back to menu logic
     self.screen_states = {k: False for k in self.screen_states}
     self.menu_active = True
     self.update()

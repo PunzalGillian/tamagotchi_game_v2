@@ -85,6 +85,25 @@ class TamagotchiApp(QWidget):
         self.setup_ui()
         self.sound_manager.play("start")
 
+        self.pet_dead = False
+        self._death_exit_scheduled = False
+
+    # --- Add this reusable function ---
+    def draw_centered_wrapped_text(self, painter, text, font, rect):
+        """
+        Draws wrapped text centered vertically and horizontally in the given rect.
+        """
+        wrapped = self.wrap_text_to_box(text, font, rect.width() - 20, rect.height() - 10)
+        painter.setFont(font)
+        painter.setPen(QPen(QColor(0, 0, 0)))
+        metrics = QFontMetrics(font)
+        lines = wrapped.split('\n')
+        text_height = metrics.lineSpacing() * len(lines)
+        y_offset = rect.top() + (rect.height() - text_height) // 2
+        x_offset = rect.left() + 10  # 10px left padding
+        for i, line in enumerate(lines):
+            painter.drawText(x_offset, y_offset + metrics.ascent() + i * metrics.lineSpacing(), line)
+
     def setup_ui(self):
         self.buttonA, self.buttonB, self.buttonC = create_tama_buttons(
             self, self.prev_egg_or_menu, self.select_or_action, self.next_egg_or_menu
@@ -106,10 +125,17 @@ class TamagotchiApp(QWidget):
         painter.setBrush(QColor(200, 200, 200)); painter.setPen(QPen(QColor(63, 99, 171), 8))
         painter.drawRect(screen)
 
+        # --- PET DEATH: Show only the death message, centered, and skip all other UI ---
+        if getattr(self, "pet_dead", False):
+            font = QFont("PixelOperator.ttf", 12)
+            msg = self.texts.get("dead", "Your pet died.")
+            self.draw_centered_wrapped_text(painter, msg, font, screen)
+            return
+
         # Draw pet or egg
-        if self.selected_pet and not self.any_subscreen() and not self.choosing_food:
-            pet_img = self.pet_images[self.selected_pet.name].scaled(102, 102)
-            painter.drawPixmap((self.width() - 102) // 2, (self.height() - 102) // 2 - 15, pet_img)
+        if self.selected_pet and not self.any_subscreen() and not self.choosing_food and not getattr(self, "pet_dead", False):
+            pet_img = self.pet_images[self.selected_pet.name].scaled(85, 85)
+            painter.drawPixmap((self.width() - 85) // 2, (self.height() - 85) // 2 - 15, pet_img)
         elif not self.selected_pet:
             name = self.egg_names[self.current_egg_index]
             egg = self.egg_images[name].scaled(78, 91)
@@ -120,22 +146,14 @@ class TamagotchiApp(QWidget):
 
         # Draw wrapped, centered text for active screen
         font = QFont("PixelOperator.ttf", 10)
-        painter.setFont(font)
         for key in self.screen_states:
             if self.screen_states[key]:
-                wrapped = self.wrap_text_to_box(self.texts[key], font, screen_w - 24, screen_h - 12)  # 24px left/right padding
-                painter.setPen(QPen(QColor(0, 0, 0)))
                 if key == "status":
-                    # Calculate vertical centering
-                    metrics = QFontMetrics(font)
-                    lines = wrapped.split('\n')
-                    text_height = metrics.lineSpacing() * len(lines)
-                    y_offset = center_y + (screen_h - text_height) // 2
-                    x_offset = center_x + 12  # 12px left padding
-                    for i, line in enumerate(lines):
-                        painter.drawText(x_offset, y_offset + metrics.ascent() + i * metrics.lineSpacing(), line)
+                    self.draw_centered_wrapped_text(painter, self.texts[key], font, screen)
                 else:
-                    painter.drawText(screen, Qt.AlignCenter, wrapped)
+                    painter.setFont(font)
+                    painter.setPen(QPen(QColor(0, 0, 0)))
+                    painter.drawText(screen, Qt.AlignCenter, self.wrap_text_to_box(self.texts[key], font, screen_w - 24, screen_h - 12))
 
         if self.choosing_food:
             food = self.food_names[self.current_food_index]

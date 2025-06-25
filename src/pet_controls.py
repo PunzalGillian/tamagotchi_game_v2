@@ -7,6 +7,7 @@ class PetBase(ABC):
         self._happiness = 4
         self._health = 6
         self._hunger = 6
+        self._status = "Your pet is alive and well"
 
     @abstractmethod
     def initialize_stats(self):
@@ -75,6 +76,14 @@ class PetControls:
         return f"{food['name']} eaten!"
 
     def status(self):
+        if self.pet._hunger <= 2:
+            self.pet._weight -= 1
+            self.pet._happiness -= 2
+            self.pet._health -= 1
+        if self.pet._hunger <= 0:
+            self.pet._happiness -= 2
+            self.pet._health = 0
+            self.pet._status = "Your pet died from hunger."
         return (
             f"\nName: {self.pet._name}"
             f"\n\tWeight: {self.pet._weight}kg"
@@ -86,6 +95,8 @@ class PetControls:
     def play(self):
         self.pet._happiness = min(10, self.pet._happiness + 5)
         self.pet._hunger = max(0, self.pet._hunger - 3)
+        if self.pet._hunger <= 0:
+            return f"{self.pet._name} is too hungry to play!"
         return f"{self.pet._name} played! Happiness: {self.pet._happiness}, \nHunger: {self.pet._hunger}"
 
     def give_medicine(self):
