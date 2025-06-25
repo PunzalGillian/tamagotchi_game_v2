@@ -1,8 +1,15 @@
-from PyQt5.QtWidgets import QWidget, QPushButton
+from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPainter, QPainterPath, QPixmap, QPen, QColor, QFont, QFontMetrics
 from PyQt5.QtCore import Qt, QRectF, QPoint, QTimer
 from sound_manager import SoundManager
 from pet_factory import PetFactory
+from pet_controls import PetControls
+from tama_buttons import TamaButton, create_tama_buttons
+from decisions import (
+    back_to_menu, menu_options, select_or_action,
+    next_egg_or_menu, prev_egg_or_menu,
+    mousePressEvent, mouseMoveEvent
+)
 
 class TamagotchiApp(QWidget):
     EGGS = {
@@ -51,6 +58,7 @@ class TamagotchiApp(QWidget):
 
         self.current_egg_index = 0
         self.selected_pet = None
+        self.pet_controls = None
         self.menu_active = False
         self.current_menu_index = 0
 
@@ -62,20 +70,22 @@ class TamagotchiApp(QWidget):
         self.food_names = [f["name"] for f in self.FOODS]
         self.food_data = {f["name"]: f for f in self.FOODS}
 
+        # --- Assign decision functions BEFORE setup_ui ---
+        self.back_to_menu = back_to_menu.__get__(self)
+        self.menu_options = menu_options.__get__(self)
+        self.select_or_action = select_or_action.__get__(self)
+        self.next_egg_or_menu = next_egg_or_menu.__get__(self)
+        self.prev_egg_or_menu = prev_egg_or_menu.__get__(self)
+        self.mousePressEvent = mousePressEvent.__get__(self)
+        self.mouseMoveEvent = mouseMoveEvent.__get__(self)
+
         self.setup_ui()
         self.sound_manager.play("start")
 
     def setup_ui(self):
-        def make_btn(label, x, cb):
-            btn = QPushButton(label, self)
-            btn.setFixedSize(30, 30)
-            btn.setStyleSheet("border-radius: 15px; background-color: lightgray; border: 3px solid rgb(63,99,171);")
-            btn.move(x, 260)
-            btn.clicked.connect(cb)
-            return btn
-        self.buttonA = make_btn("A", 73, self.prev_egg_or_menu)
-        self.buttonB = make_btn("B", 120, self.select_or_action)
-        self.buttonC = make_btn("C", 168, self.next_egg_or_menu)
+        self.buttonA, self.buttonB, self.buttonC = create_tama_buttons(
+            self, self.prev_egg_or_menu, self.select_or_action, self.next_egg_or_menu
+        )
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -133,63 +143,6 @@ class TamagotchiApp(QWidget):
     def any_subscreen(self):
         return any(self.screen_states.values())
 
-    def prev_egg_or_menu(self):
-        if self.choosing_food:
-            self.current_food_index = (self.current_food_index - 1) % len(self.food_names)
-            self.update()
-            return
-        if not self.selected_pet:
-            self.current_egg_index = (self.current_egg_index - 1) % len(self.egg_names)
-        elif self.menu_active:
-            self.current_menu_index = (self.current_menu_index - 1) % len(self.MENU_ITEMS)
-        self.update()
-
-    def next_egg_or_menu(self):
-        if self.choosing_food:
-            self.current_food_index = (self.current_food_index + 1) % len(self.food_names)
-            self.update()
-            return
-        if not self.selected_pet:
-            self.current_egg_index = (self.current_egg_index + 1) % len(self.egg_names)
-        elif self.menu_active:
-            self.current_menu_index = (self.current_menu_index + 1) % len(self.MENU_ITEMS)
-        self.update()
-
-    def select_or_action(self):
-        if self.choosing_food:
-            food = self.food_names[self.current_food_index]
-            food_info = self.food_data[food]
-            # Check if already full
-            if self.selected_pet._hunger >= 10:
-                self.texts["feed"] = "You're already full, come back later"
-            else:
-                # Update stats
-                self.selected_pet._hunger = min(10, self.selected_pet._hunger + food_info["hunger"])
-                self.selected_pet._happiness = min(10, self.selected_pet._happiness + food_info["happiness"])
-                # Build message
-                if food == "Cake":
-                    msg = f"{food} eaten!\nHunger +3,\nHappiness +3"
-                elif food == "Milk":
-                    msg = f"{food} eaten!\nHunger +5"
-                else:
-                    msg = f"{food} eaten!"
-                self.texts["feed"] = msg
-            self.screen_states = {k: False for k in self.screen_states}
-            self.screen_states["feed"] = True
-            self.choosing_food = False
-            self.update()
-            return
-        if not self.selected_pet:
-            name = self.egg_names[self.current_egg_index]
-            self.selected_pet = PetFactory.create_pet(name)
-            self.sound_manager.play("hatch")
-            QTimer.singleShot(500, self.activate_menu)
-        elif self.menu_active:
-            self.menu_options()
-        elif self.any_subscreen():
-            self.back_to_menu()
-        self.update()
-
     def activate_menu(self):
         self.menu_active = True
         self.update()
@@ -205,51 +158,6 @@ class TamagotchiApp(QWidget):
                 pen = QPen(QColor(63, 99, 171), 4)
                 painter.setPen(pen)
                 painter.drawRect(QRectF(item_x, start_y, item_w, item_h))
-
-    def menu_options(self):
-        name = self.MENU_ITEMS[self.current_menu_index]["name"]
-        self.menu_active = False
-        self.screen_states = {k: False for k in self.screen_states}
-        font = QFont("PixelOperator.ttf", 8)
-        screen_w, screen_h = 162, 151
-        pet_methods = {
-            "Status": self.selected_pet.status,
-            "Medicine": self.selected_pet.give_medicine,
-            "Feed": self.selected_pet.feed,
-            "Play": self.selected_pet.play
-        }
-        key_map = {
-            "Status": "status",
-            "Medicine": "medicine",
-            "Feed": "feed",
-            "Play": "play"
-        }
-        if name == "Feed":
-            self.choosing_food = True
-            self.current_food_index = 0
-            self.menu_active = False
-            self.screen_states = {k: False for k in self.screen_states}
-            self.update()
-        elif name in pet_methods:
-            raw_text = pet_methods[name]()
-            self.texts[key_map[name]] = self.wrap_text_to_box(raw_text, font, screen_w - 10, screen_h - 10)
-            self.screen_states[key_map[name]] = True
-            self.update()
-
-    def back_to_menu(self):
-        self.screen_states = {k: False for k in self.screen_states}
-        self.menu_active = True
-        self.update()
-
-    def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            self.oldPosition = event.globalPos()
-
-    def mouseMoveEvent(self, event):
-        if event.buttons() == Qt.LeftButton:
-            delta = event.globalPos() - self.oldPosition
-            self.move(self.x() + delta.x(), self.y() + delta.y())
-            self.oldPosition = event.globalPos()
 
     def wrap_text_to_box(self, text, font, max_width, max_height):
         metrics = QFontMetrics(font)
