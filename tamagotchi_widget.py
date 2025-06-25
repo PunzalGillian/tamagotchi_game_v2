@@ -43,7 +43,7 @@ class TamagotchiApp(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.setFixedSize(270, 318)
+        self.setFixedSize(324, 382)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.oldPosition = QPoint(0, 0)
@@ -93,14 +93,14 @@ class TamagotchiApp(QWidget):
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
-        ellipse_path = QPainterPath(); ellipse_path.addEllipse(QRectF(0, 0, 270, 318))
+        ellipse_path = QPainterPath(); ellipse_path.addEllipse(QRectF(0, 0, 324, 382))
         painter.setClipPath(ellipse_path)
         if not self.bg_image.isNull():
-            painter.drawPixmap(0, 0, self.bg_image.scaled(270, 318))
-        pen = QPen(QColor(63, 99, 171), 10)
+            painter.drawPixmap(0, 0, self.bg_image.scaled(324, 382))
+        pen = QPen(QColor(63, 99, 171), 12)
         painter.setPen(pen); painter.setClipping(False)
-        painter.drawEllipse(5, 5, 260, 308)
-        screen_w, screen_h = 162, 151
+        painter.drawEllipse(5, 5, 312, 370)
+        screen_w, screen_h = 195, 181
         center_x, center_y = (self.width() - screen_w) // 2, (self.height() - screen_h) // 2
         screen = QRectF(center_x, center_y, screen_w, screen_h)
         painter.setBrush(QColor(200, 200, 200)); painter.setPen(QPen(QColor(63, 99, 171), 8))
@@ -108,22 +108,22 @@ class TamagotchiApp(QWidget):
 
         # Draw pet or egg
         if self.selected_pet and not self.any_subscreen() and not self.choosing_food:
-            pet_img = self.pet_images[self.selected_pet.name].scaled(85, 85)
-            painter.drawPixmap((self.width() - 85) // 2, (self.height() - 85) // 2 - 15, pet_img)
+            pet_img = self.pet_images[self.selected_pet.name].scaled(102, 102)
+            painter.drawPixmap((self.width() - 102) // 2, (self.height() - 102) // 2 - 15, pet_img)
         elif not self.selected_pet:
             name = self.egg_names[self.current_egg_index]
-            egg = self.egg_images[name].scaled(65, 76)
-            painter.drawPixmap((self.width() - 65) // 2, (self.height() - 75) // 2, egg)
+            egg = self.egg_images[name].scaled(78, 91)
+            painter.drawPixmap((self.width() - 78) // 2, (self.height() - 91) // 2, egg)
 
         if self.menu_active:
             self.menu_layout(painter, center_x, center_y)
 
         # Draw wrapped, centered text for active screen
-        font = QFont("PixelOperator.ttf", 8)
+        font = QFont("PixelOperator.ttf", 10)
         painter.setFont(font)
         for key in self.screen_states:
             if self.screen_states[key]:
-                wrapped = self.wrap_text_to_box(self.texts[key], font, screen_w - 20, screen_h - 10)  # 20px left/right padding
+                wrapped = self.wrap_text_to_box(self.texts[key], font, screen_w - 24, screen_h - 12)  # 24px left/right padding
                 painter.setPen(QPen(QColor(0, 0, 0)))
                 if key == "status":
                     # Calculate vertical centering
@@ -131,7 +131,7 @@ class TamagotchiApp(QWidget):
                     lines = wrapped.split('\n')
                     text_height = metrics.lineSpacing() * len(lines)
                     y_offset = center_y + (screen_h - text_height) // 2
-                    x_offset = center_x + 10  # 10px left padding
+                    x_offset = center_x + 12  # 12px left padding
                     for i, line in enumerate(lines):
                         painter.drawText(x_offset, y_offset + metrics.ascent() + i * metrics.lineSpacing(), line)
                 else:
@@ -139,8 +139,8 @@ class TamagotchiApp(QWidget):
 
         if self.choosing_food:
             food = self.food_names[self.current_food_index]
-            img = self.food_images[food].scaled(75, 75)
-            painter.drawPixmap((self.width() - 75) // 2, (self.height() - 75) // 2, img)
+            img = self.food_images[food].scaled(90, 90)
+            painter.drawPixmap((self.width() - 90) // 2, (self.height() - 90) // 2, img)
             return  # Skip drawing pet/egg/text while choosing food
 
     def any_subscreen(self):
@@ -151,10 +151,10 @@ class TamagotchiApp(QWidget):
         self.update()
 
     def menu_layout(self, painter, center_x, center_y):
-        item_w, item_h = 30, 30
-        start_x, start_y = center_x + 12, center_y + 110
+        item_w, item_h = 36, 36
+        start_x, start_y = center_x + 15, center_y + 132
         for i, item in enumerate(self.MENU_ITEMS):
-            item_x = start_x + i * (item_w + 5)
+            item_x = start_x + i * (item_w + 6)
             scaled_menu_item = self.menu_images[item["name"]].scaled(item_w, item_h)
             painter.drawPixmap(item_x, start_y, scaled_menu_item)
             if i == self.current_menu_index:

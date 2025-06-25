@@ -47,11 +47,11 @@ class PetBase(ABC):
 
     def status(self):
         return (
-            f"\nName: {self._name}"
-            f"\n\tWeight: {self._weight}kg"
-            f"\n\tHappiness: {self._happiness}/10"
+            f"\n\tName: {self._name}\n"
+            f"\n\tWeight: {self._weight}kg\n"
+            f"\n\tHappiness: {self._happiness}/10\n"
             f"\n\tHealth: {self._health}/10\n"
-            f"\n\tHunger: {self._hunger}/10"
+            f"\n\tHunger: {self._hunger}/10\n"
         )
 
 class PetControls:
