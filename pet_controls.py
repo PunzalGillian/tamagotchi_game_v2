@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class Pet(ABC):
+class PetBase(ABC):
     def __init__(self, name):
         self._name = name
         self._weight = 1
@@ -31,7 +31,7 @@ class Pet(ABC):
     @property
     def hunger(self):
         return self._hunger
-    
+
     def feed(self):
         if self._hunger < 10:
             self._hunger = min(10, self._hunger + 5)
@@ -48,3 +48,12 @@ class Pet(ABC):
             self._health = min(10, self._health + 5)
             return f"{self._name} received medicine. Health: {self._health}"
         return f"{self._name}'s health is full."
+
+    def status(self):
+        return (
+            f"\n  Name: {self._name}\n"
+            f"  Weight: {self._weight}kg\n"
+            f"  Happiness: {self._happiness}/10\n"
+            f"  Health: {self._health}/10\n"
+            f"  Hunger: {self._hunger}/10"
+        )
