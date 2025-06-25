@@ -99,9 +99,10 @@ class TamagotchiApp(QWidget):
         metrics = QFontMetrics(font)
         lines = wrapped.split('\n')
         text_height = metrics.lineSpacing() * len(lines)
-        y_offset = rect.top() + (rect.height() - text_height) // 2
-        x_offset = rect.left() + 10  # 10px left padding
+        y_offset = int(rect.top() + (rect.height() - text_height) // 2)
         for i, line in enumerate(lines):
+            line_width = metrics.horizontalAdvance(line)
+            x_offset = int(rect.left() + (rect.width() - line_width) // 2)
             painter.drawText(x_offset, y_offset + metrics.ascent() + i * metrics.lineSpacing(), line)
 
     def setup_ui(self):
@@ -134,8 +135,8 @@ class TamagotchiApp(QWidget):
 
         # Draw pet or egg
         if self.selected_pet and not self.any_subscreen() and not self.choosing_food and not getattr(self, "pet_dead", False):
-            pet_img = self.pet_images[self.selected_pet.name].scaled(85, 85)
-            painter.drawPixmap((self.width() - 85) // 2, (self.height() - 85) // 2 - 15, pet_img)
+            pet_img = self.pet_images[self.selected_pet.name].scaled(95, 95)
+            painter.drawPixmap((self.width() - 95) // 2, (self.height() - 95) // 2 - 15, pet_img)
         elif not self.selected_pet:
             name = self.egg_names[self.current_egg_index]
             egg = self.egg_images[name].scaled(78, 91)
