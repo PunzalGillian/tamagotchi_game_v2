@@ -1,4 +1,4 @@
-from pets import Bulbasaur, Jigglypuff, Charizard, Squirtle, Ghastly, Oddish
+from src.pets import Bulbasaur, Jigglypuff, Charizard, Squirtle, Ghastly, Oddish
 
 class PetFactory:
     @staticmethod

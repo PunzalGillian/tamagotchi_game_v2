@@ -1,4 +1,4 @@
-from pet_controls import PetBase
+from src.pet_controls import PetBase
 
 class Bulbasaur(PetBase):
     def initialize_stats(self):

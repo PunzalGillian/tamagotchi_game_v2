@@ -1,11 +1,11 @@
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPainter, QPainterPath, QPixmap, QPen, QColor, QFont, QFontMetrics
 from PyQt5.QtCore import Qt, QRectF, QPoint, QTimer
-from sound_manager import SoundManager
-from pet_factory import PetFactory
-from pet_controls import PetControls
-from tama_buttons import TamaButton, create_tama_buttons
-from decisions import (
+from src.sound_manager import SoundManager
+from src.pet_factory import PetFactory
+from src.pet_controls import PetControls
+from src.tama_buttons import TamaButton, create_tama_buttons
+from src.decisions import (
     back_to_menu, menu_options, select_or_action,
     next_egg_or_menu, prev_egg_or_menu,
     mousePressEvent, mouseMoveEvent
