@@ -37,7 +37,9 @@ class PetBase(ABC):
 
     def play(self):
         self._happiness = min(10, self._happiness + 5)
-        return f"{self._name} played! Happiness: {self._happiness}"
+        self._hunger = max(0, self._hunger - 3)
+        return f"{self._name} played! Happiness: {self._happiness}, \nHunger: {self._hunger}"
+    
 
     def give_medicine(self):
         if self._health < 10:
@@ -83,7 +85,8 @@ class PetControls:
 
     def play(self):
         self.pet._happiness = min(10, self.pet._happiness + 5)
-        return f"{self.pet._name} played! Happiness: {self.pet._happiness}"
+        self.pet._hunger = max(0, self.pet._hunger - 3)
+        return f"{self.pet._name} played! Happiness: {self.pet._happiness}, \nHunger: {self.pet._hunger}"
 
     def give_medicine(self):
         if self.pet._health < 10:
