@@ -51,9 +51,9 @@ class PetBase(ABC):
 
     def status(self):
         return (
-            f"\n  Name: {self._name}\n"
-            f"  Weight: {self._weight}kg\n"
-            f"  Happiness: {self._happiness}/10\n"
-            f"  Health: {self._health}/10\n"
-            f"  Hunger: {self._hunger}/10"
+            f"\nName: {self._name}"
+            f"\n\tWeight: {self._weight}kg"
+            f"\n\tHappiness: {self._happiness}/10"
+            f"\n\tHealth: {self._health}/10\n"
+            f"\n\tHunger: {self._hunger}/10"
         )

@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QPushButton
-from PyQt5.QtGui import QPainter, QPainterPath, QPixmap, QPen, QColor, QFont
+from PyQt5.QtGui import QPainter, QPainterPath, QPixmap, QPen, QColor, QFont, QFontMetrics
 from PyQt5.QtCore import Qt, QRectF, QPoint, QTimer
 from sound_manager import SoundManager
 from pet_factory import PetFactory
@@ -37,9 +37,9 @@ class TamagotchiApp(QWidget):
 
         self.sound_manager = SoundManager()
         self.egg_names = list(self.EGGS.keys())
-        self.egg_images = {name: QPixmap(path) for name, path in self.EGGS.items()}
-        self.pet_images = {name: QPixmap(path) for name, path in self.PET_IMAGES.items()}
-        self.menu_images = {item["name"]: QPixmap(item["image"]) for item in self.MENU_ITEMS}
+        self.egg_images = {n: QPixmap(p) for n, p in self.EGGS.items()}
+        self.pet_images = {n: QPixmap(p) for n, p in self.PET_IMAGES.items()}
+        self.menu_images = {i["name"]: QPixmap(i["image"]) for i in self.MENU_ITEMS}
         self.bg_image = QPixmap("img/bg.png")
 
         self.current_egg_index = 0
@@ -47,8 +47,8 @@ class TamagotchiApp(QWidget):
         self.menu_active = False
         self.current_menu_index = 0
 
-        self.screen_states = {"status": False, "medicine": False, "feed": False, "play": False}
-        self.texts = {"status": "", "medicine": "", "feed": "", "play": ""}
+        self.screen_states = {k: False for k in ["status", "medicine", "feed", "play"]}
+        self.texts = {k: "" for k in self.screen_states}
 
         self.setup_ui()
         self.sound_manager.play("start")
@@ -78,10 +78,10 @@ class TamagotchiApp(QWidget):
         screen_w, screen_h = 162, 151
         center_x, center_y = (self.width() - screen_w) // 2, (self.height() - screen_h) // 2
         screen = QRectF(center_x, center_y, screen_w, screen_h)
-        painter.setBrush(QColor(200, 200, 200)); painter.setPen(pen)
+        painter.setBrush(QColor(200, 200, 200)); painter.setPen(QPen(QColor(63, 99, 171), 8))
         painter.drawRect(screen)
 
-        # Draw pet if not in a sub-screen, else draw sub-screen text
+        # Draw pet or egg
         if self.selected_pet and not self.any_subscreen():
             pet_img = self.pet_images[self.selected_pet.name].scaled(85, 85)
             painter.drawPixmap((self.width() - 85) // 2, (self.height() - 85) // 2 - 15, pet_img)
@@ -93,11 +93,14 @@ class TamagotchiApp(QWidget):
         if self.menu_active:
             self.menu_layout(painter, center_x, center_y)
 
-        painter.setPen(QPen(QColor(0, 0, 0)))
-        painter.setFont(QFont("PixelOperator.ttf", 8))
+        # Draw wrapped, centered text for active screen
+        font = QFont("PixelOperator.ttf", 8)
+        painter.setFont(font)
         for key in self.screen_states:
             if self.screen_states[key]:
-                painter.drawText(screen, Qt.AlignLeft | Qt.AlignTop, self.texts[key])
+                wrapped = self.wrap_text_to_box(self.texts[key], font, screen_w - 10, screen_h - 10)
+                painter.setPen(QPen(QColor(0, 0, 0)))
+                painter.drawText(screen, Qt.AlignCenter, wrapped)
 
     def any_subscreen(self):
         return any(self.screen_states.values())
@@ -148,18 +151,24 @@ class TamagotchiApp(QWidget):
         name = self.MENU_ITEMS[self.current_menu_index]["name"]
         self.menu_active = False
         self.screen_states = {k: False for k in self.screen_states}
-        if name == "Status":
-            self.texts["status"] = self.selected_pet.status()
-            self.screen_states["status"] = True
-        elif name == "Medicine":
-            self.texts["medicine"] = f"\n\n  {self.selected_pet.give_medicine()}"
-            self.screen_states["medicine"] = True
-        elif name == "Feed":
-            self.texts["feed"] = f"\n\n  {self.selected_pet.feed()}"
-            self.screen_states["feed"] = True
-        elif name == "Play":
-            self.texts["play"] = f"\n\n  {self.selected_pet.play()}"
-            self.screen_states["play"] = True
+        font = QFont("PixelOperator.ttf", 8)
+        screen_w, screen_h = 162, 151
+        pet_methods = {
+            "Status": self.selected_pet.status,
+            "Medicine": self.selected_pet.give_medicine,
+            "Feed": self.selected_pet.feed,
+            "Play": self.selected_pet.play
+        }
+        key_map = {
+            "Status": "status",
+            "Medicine": "medicine",
+            "Feed": "feed",
+            "Play": "play"
+        }
+        if name in pet_methods:
+            raw_text = pet_methods[name]()
+            self.texts[key_map[name]] = self.wrap_text_to_box(raw_text, font, screen_w - 10, screen_h - 10)
+            self.screen_states[key_map[name]] = True
         self.update()
 
     def back_to_menu(self):
@@ -167,7 +176,6 @@ class TamagotchiApp(QWidget):
         self.menu_active = True
         self.update()
 
-    # --- Draggable widget ---
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.oldPosition = event.globalPos()
@@ -177,3 +185,22 @@ class TamagotchiApp(QWidget):
             delta = event.globalPos() - self.oldPosition
             self.move(self.x() + delta.x(), self.y() + delta.y())
             self.oldPosition = event.globalPos()
+
+    def wrap_text_to_box(self, text, font, max_width, max_height):
+        metrics = QFontMetrics(font)
+        words = text.split()
+        lines, line = [], ""
+        for word in words:
+            test_line = f"{line} {word}".strip()
+            if metrics.horizontalAdvance(test_line) > max_width and line:
+                lines.append(line)
+                line = word
+            else:
+                line = test_line
+        if line: lines.append(line)
+        line_height = metrics.lineSpacing()
+        max_lines = max_height // line_height
+        if len(lines) > max_lines:
+            lines = lines[:max_lines]
+            lines[-1] += " ..."
+        return "\n".join(lines)
