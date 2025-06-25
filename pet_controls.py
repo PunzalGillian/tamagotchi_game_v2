@@ -33,11 +33,7 @@ class PetBase(ABC):
         return self._hunger
 
     def feed(self):
-        if self._hunger < 10:
-            self._hunger = min(10, self._hunger + 5)
-            self._happiness = min(10, self._happiness + 5)
-            return f"{self._name} was fed. \nHunger: {self._hunger}, \nHappiness: {self._happiness}"
-        return f"{self._name} is not hungry."
+        return f"{self._name} wants you to choose a food!"
 
     def play(self):
         self._happiness = min(10, self._happiness + 5)
@@ -57,3 +53,40 @@ class PetBase(ABC):
             f"\n\tHealth: {self._health}/10\n"
             f"\n\tHunger: {self._hunger}/10"
         )
+
+class PetControls:
+    def __init__(self, pet):
+        self.pet = pet
+
+    def can_feed(self):
+        return self.pet._hunger < 10
+
+    def feed(self, food):
+        if not self.can_feed():
+            return "You're already full, come back later"
+        self.pet._hunger = min(10, self.pet._hunger + food["hunger"])
+        self.pet._happiness = min(10, self.pet._happiness + food["happiness"])
+        if food["name"] == "Cake":
+            return f"{food['name']} eaten!\nHunger +3,\nHappiness +3"
+        elif food["name"] == "Milk":
+            return f"{food['name']} eaten!\nHunger +5"
+        return f"{food['name']} eaten!"
+
+    def status(self):
+        return (
+            f"\nName: {self.pet._name}"
+            f"\n\tWeight: {self.pet._weight}kg"
+            f"\n\tHappiness: {self.pet._happiness}/10"
+            f"\n\tHealth: {self.pet._health}/10\n"
+            f"\n\tHunger: {self.pet._hunger}/10"
+        )
+
+    def play(self):
+        self.pet._happiness = min(10, self.pet._happiness + 5)
+        return f"{self.pet._name} played! Happiness: {self.pet._happiness}"
+
+    def give_medicine(self):
+        if self.pet._health < 10:
+            self.pet._health = min(10, self.pet._health + 5)
+            return f"{self.pet._name} received medicine. \nHealth: {self.pet._health}"
+        return f"{self.pet._name}'s health is full."

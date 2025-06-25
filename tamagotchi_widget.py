@@ -28,6 +28,12 @@ class TamagotchiApp(QWidget):
         {"name": "Play", "image": "img/play.png"}
     ]
 
+    FOODS = [
+        {"name": "Milk", "image": "img/milk.png", "hunger": 5, "happiness": 0},
+        {"name": "Cake", "image": "img/cake.png", "hunger": 3, "happiness": 3}
+    ]
+
+
     def __init__(self):
         super().__init__()
         self.setFixedSize(270, 318)
@@ -39,6 +45,7 @@ class TamagotchiApp(QWidget):
         self.egg_names = list(self.EGGS.keys())
         self.egg_images = {n: QPixmap(p) for n, p in self.EGGS.items()}
         self.pet_images = {n: QPixmap(p) for n, p in self.PET_IMAGES.items()}
+        self.food_images = {f["name"]: QPixmap(f["image"]) for f in self.FOODS}
         self.menu_images = {i["name"]: QPixmap(i["image"]) for i in self.MENU_ITEMS}
         self.bg_image = QPixmap("img/bg.png")
 
@@ -49,6 +56,11 @@ class TamagotchiApp(QWidget):
 
         self.screen_states = {k: False for k in ["status", "medicine", "feed", "play"]}
         self.texts = {k: "" for k in self.screen_states}
+
+        self.choosing_food = False
+        self.current_food_index = 0
+        self.food_names = [f["name"] for f in self.FOODS]
+        self.food_data = {f["name"]: f for f in self.FOODS}
 
         self.setup_ui()
         self.sound_manager.play("start")
@@ -82,7 +94,7 @@ class TamagotchiApp(QWidget):
         painter.drawRect(screen)
 
         # Draw pet or egg
-        if self.selected_pet and not self.any_subscreen():
+        if self.selected_pet and not self.any_subscreen() and not self.choosing_food:
             pet_img = self.pet_images[self.selected_pet.name].scaled(85, 85)
             painter.drawPixmap((self.width() - 85) // 2, (self.height() - 85) // 2 - 15, pet_img)
         elif not self.selected_pet:
@@ -112,10 +124,20 @@ class TamagotchiApp(QWidget):
                 else:
                     painter.drawText(screen, Qt.AlignCenter, wrapped)
 
+        if self.choosing_food:
+            food = self.food_names[self.current_food_index]
+            img = self.food_images[food].scaled(75, 75)
+            painter.drawPixmap((self.width() - 75) // 2, (self.height() - 75) // 2, img)
+            return  # Skip drawing pet/egg/text while choosing food
+
     def any_subscreen(self):
         return any(self.screen_states.values())
 
     def prev_egg_or_menu(self):
+        if self.choosing_food:
+            self.current_food_index = (self.current_food_index - 1) % len(self.food_names)
+            self.update()
+            return
         if not self.selected_pet:
             self.current_egg_index = (self.current_egg_index - 1) % len(self.egg_names)
         elif self.menu_active:
@@ -123,6 +145,10 @@ class TamagotchiApp(QWidget):
         self.update()
 
     def next_egg_or_menu(self):
+        if self.choosing_food:
+            self.current_food_index = (self.current_food_index + 1) % len(self.food_names)
+            self.update()
+            return
         if not self.selected_pet:
             self.current_egg_index = (self.current_egg_index + 1) % len(self.egg_names)
         elif self.menu_active:
@@ -130,6 +156,29 @@ class TamagotchiApp(QWidget):
         self.update()
 
     def select_or_action(self):
+        if self.choosing_food:
+            food = self.food_names[self.current_food_index]
+            food_info = self.food_data[food]
+            # Check if already full
+            if self.selected_pet._hunger >= 10:
+                self.texts["feed"] = "You're already full, come back later"
+            else:
+                # Update stats
+                self.selected_pet._hunger = min(10, self.selected_pet._hunger + food_info["hunger"])
+                self.selected_pet._happiness = min(10, self.selected_pet._happiness + food_info["happiness"])
+                # Build message
+                if food == "Cake":
+                    msg = f"{food} eaten!\nHunger +3,\nHappiness +3"
+                elif food == "Milk":
+                    msg = f"{food} eaten!\nHunger +5"
+                else:
+                    msg = f"{food} eaten!"
+                self.texts["feed"] = msg
+            self.screen_states = {k: False for k in self.screen_states}
+            self.screen_states["feed"] = True
+            self.choosing_food = False
+            self.update()
+            return
         if not self.selected_pet:
             name = self.egg_names[self.current_egg_index]
             self.selected_pet = PetFactory.create_pet(name)
@@ -175,11 +224,17 @@ class TamagotchiApp(QWidget):
             "Feed": "feed",
             "Play": "play"
         }
-        if name in pet_methods:
+        if name == "Feed":
+            self.choosing_food = True
+            self.current_food_index = 0
+            self.menu_active = False
+            self.screen_states = {k: False for k in self.screen_states}
+            self.update()
+        elif name in pet_methods:
             raw_text = pet_methods[name]()
             self.texts[key_map[name]] = self.wrap_text_to_box(raw_text, font, screen_w - 10, screen_h - 10)
             self.screen_states[key_map[name]] = True
-        self.update()
+            self.update()
 
     def back_to_menu(self):
         self.screen_states = {k: False for k in self.screen_states}
