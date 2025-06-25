@@ -47,7 +47,10 @@ class TamagotchiApp(QWidget):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.oldPosition = QPoint(0, 0)
+        self.QTimer = QTimer
 
+        self.PetFactory = PetFactory
+        self.PetControls = PetControls
         self.sound_manager = SoundManager()
         self.egg_names = list(self.EGGS.keys())
         self.egg_images = {n: QPixmap(p) for n, p in self.EGGS.items()}
@@ -177,3 +180,4 @@ class TamagotchiApp(QWidget):
             lines = lines[:max_lines]
             lines[-1] += " ..."
         return "\n".join(lines)
+

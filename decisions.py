@@ -1,3 +1,5 @@
+from PyQt5.QtCore import Qt
+
 def back_to_menu(self):
     self.screen_states = {k: False for k in self.screen_states}
     self.menu_active = True
@@ -87,11 +89,11 @@ def prev_egg_or_menu(self):
     self.update()
 
 def mousePressEvent(self, event):
-    if event.button() == self.Qt.LeftButton:
+    if event.button() == Qt.LeftButton:
         self.oldPosition = event.globalPos()
 
 def mouseMoveEvent(self, event):
-    if event.buttons() == self.Qt.LeftButton:
+    if event.buttons() == Qt.LeftButton:
         delta = event.globalPos() - self.oldPosition
         self.move(self.x() + delta.x(), self.y() + delta.y())
         self.oldPosition = event.globalPos()
