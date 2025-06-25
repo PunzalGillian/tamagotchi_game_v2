@@ -81,12 +81,10 @@ Play games with it to increase happiness!
 Coming soon…
 
 ## 🚧 Future Improvements
-Add more Pokémon and evolution mechanics
+- Add more Pokémon and evolution mechanics
+- Enhance animations and sound effects
+- Save/load pet progress across sessions
+- Improve mobile/touch UI support
+- Add multiplayer pet battles or trading features
 
-Enhance animations and sound effects
-
-Save/load pet progress across sessions
-
-Improve mobile/touch UI support
-
-Add multiplayer pet battles or trading features
+  > [Originally built for a school assignment]
