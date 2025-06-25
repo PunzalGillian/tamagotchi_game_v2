@@ -36,7 +36,7 @@ class PetBase(ABC):
         if self._hunger < 10:
             self._hunger = min(10, self._hunger + 5)
             self._happiness = min(10, self._happiness + 5)
-            return f"{self._name} was fed. Hunger: {self._hunger}, Happiness: {self._happiness}"
+            return f"{self._name} was fed. \nHunger: {self._hunger}, \nHappiness: {self._happiness}"
         return f"{self._name} is not hungry."
 
     def play(self):
@@ -46,7 +46,7 @@ class PetBase(ABC):
     def give_medicine(self):
         if self._health < 10:
             self._health = min(10, self._health + 5)
-            return f"{self._name} received medicine. Health: {self._health}"
+            return f"{self._name} received medicine. \nHealth: {self._health}"
         return f"{self._name}'s health is full."
 
     def status(self):

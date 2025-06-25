@@ -98,9 +98,19 @@ class TamagotchiApp(QWidget):
         painter.setFont(font)
         for key in self.screen_states:
             if self.screen_states[key]:
-                wrapped = self.wrap_text_to_box(self.texts[key], font, screen_w - 10, screen_h - 10)
+                wrapped = self.wrap_text_to_box(self.texts[key], font, screen_w - 20, screen_h - 10)  # 20px left/right padding
                 painter.setPen(QPen(QColor(0, 0, 0)))
-                painter.drawText(screen, Qt.AlignCenter, wrapped)
+                if key == "status":
+                    # Calculate vertical centering
+                    metrics = QFontMetrics(font)
+                    lines = wrapped.split('\n')
+                    text_height = metrics.lineSpacing() * len(lines)
+                    y_offset = center_y + (screen_h - text_height) // 2
+                    x_offset = center_x + 10  # 10px left padding
+                    for i, line in enumerate(lines):
+                        painter.drawText(x_offset, y_offset + metrics.ascent() + i * metrics.lineSpacing(), line)
+                else:
+                    painter.drawText(screen, Qt.AlignCenter, wrapped)
 
     def any_subscreen(self):
         return any(self.screen_states.values())
