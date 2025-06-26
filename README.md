@@ -1,68 +1,90 @@
-
 # 🐾 Pokémon Tamagotchi
 
-Welcome to **Pokémon Tamagotchi** — a fun, nostalgic desktop pet game where you hatch and take care of a Pokémon!  
+Welcome to **Pokémon Tamagotchi** — a fun, nostalgic desktop pet game where you hatch and take care of a Pokémon!
 
-Built with **Python** and using **PyQt5** for the GUI and **Pygame** for sound effects, this game lets you pick a Pokémon egg, hatch it, and care for your Pokémon by feeding it, playing with it, and giving it medicine when needed. 
+Built in **Python** with **PyQt5** and **Pygame**, this game lets you hatch a Pokémon from an egg, then feed, heal, and play with it — now with multiple food options and a fully **object-oriented** architecture!
 
 🔗 **Live Demo**: Not available (local execution required)
 
 ![Python](https://img.shields.io/badge/Backend-Python-blue)
 ![PyQt5](https://img.shields.io/badge/GUI-PyQt5-green)
 ![Pygame](https://img.shields.io/badge/Sound-Pygame-red)
+![OOP](https://img.shields.io/badge/OOP-Four%20Pillars-important)
 
 ## ✨ Features
 
-- 🥚 **Pick an Egg**: Choose from various Pokémon eggs like Bulbasaur, Jigglypuff, Charizard, and more!
-- 🐣 **Hatch and Care**: Hatch your egg and care for your Pokémon by:
-  - Checking its **Status**
-  - Giving it **Medicine** if it's sick
-  - **Feeding** it to keep it healthy
-  - **Playing** with it to keep it happy
-- 🎶 **Sound Effects**: Includes hatching, attention, game start, and death sounds for an immersive experience.
-- 🎮 **Simple Controls**: Use **A**, **B**, and **C** buttons to interact and navigate the game.
-- 🎨 **Custom UI**: A nostalgic pixel art background with a draggable frameless window.
+- 🥚 **Pick an Egg**: Choose from iconic Pokémon like Bulbasaur, Jigglypuff, Charizard, Squirtle, and more!
+- 🐣 **Hatch and Care**: After hatching, care for your Pokémon by:
+  - 🔍 Checking its **Status** (health, hunger, happiness, sleep)
+  - 💊 Giving it **Medicine** when it's sick
+  - 🍽️ **Feeding** it with a variety of food choices (e.g., berry, candy, Poképuff)
+  - 🎮 **Playing** a mini-game with it to improve happiness
+- 🍎 **Food Selection Feature**: Different foods affect your Pokémon in unique ways — from restoring health to increasing happiness or weight.
+- 🎶 **Sound Effects**: Custom sound alerts for hatching, actions, and attention.
+- 🎨 **Custom UI**: Retro pixel background with a draggable, borderless window
+- 🎮 **Simple Controls**:
+  - `A` — Move left
+  - `B` — Confirm
+  - `C` — Move right
+
+## 🧠 Object-Oriented Design
+
+This project is built using the **four pillars of OOP**:
+
+### 🔐 1. Encapsulation
+All data (health, hunger, happiness, etc.) is managed within each Pokémon class. Interaction with the pet's stats happens through defined methods, hiding internal state and protecting integrity.
+
+### 🧬 2. Inheritance
+A base `Pokemon` class defines common behavior, while specific Pokémon (e.g., `Charizard`, `Squirtle`) inherit and extend those traits with custom stats or sounds.
+
+### 🌀 3. Polymorphism
+Each Pokémon subclass may override methods like `play()` or `feed()` to produce different effects or animations while using the same interface.
+
+### 🧩 4. Abstraction
+The main interface allows interaction with Pokémon through high-level commands (e.g., `pokemon.feed(selected_food)`), hiding complex logic behind simple actions.
 
 ## 🛠️ Built With
 
 - **Python**
-- **PyQt5** — for the GUI (graphical user interface)
+- **PyQt5** — for the GUI
 - **Pygame** — for sound effects
+- **OOP Principles** — for scalable architecture
 
 ## 🚀 How to Play
 
-1. **Install Dependencies**:
-   ```bash
-   pip install PyQt5 pygame
-   ```
+### 1. Install Dependencies
+```bash
+pip install PyQt5 pygame
+2. Run the Game
+bash
+Copy
+Edit
+python tamagotchi.py
+3. Controls
+A — Move selection left
 
-2. **Run the Game**:
-   ```bash
-   python tamagotchi.py
-   ```
+B — Confirm or activate option
 
-3. **Controls**:
-   - **A Button**: Move selection left (choose eggs/menu options)
-   - **B Button**: Confirm (hatch egg, interact with menu)
-   - **C Button**: Move selection right (choose eggs/menu options)
+C — Move selection right
 
-4. **Taking Care of Your Pokémon**:
-   - Use the menu to check their **health**, **happiness**, **hunger**, and **weight**.
-   - Feed and play with them to keep them healthy and happy!
+4. Gameplay Tips
+Keep an eye on your Pokémon’s status
 
-## 🚧 Known Issues / Future Improvements
+Feed your Pokémon with different food types for varied effects
 
-- Add more Pokémon eggs for variety
-- Expand the range of actions and interactions with the Pokémon
-- Include more sound effects and animations for a more immersive experience
-- Improve mobile compatibility for a larger audience
+If your Pokémon looks sick, give it medicine
+
+Play games with it to increase happiness!
+```
 
 ## 📷 Screenshots
+Coming soon…
 
-![Screenshot (395)](https://github.com/user-attachments/assets/8f54434e-9f22-430a-b750-5c15ebd79ff7)
-![Screenshot (398)](https://github.com/user-attachments/assets/64a30366-f4ec-4801-8f37-6cd5651a0c99)
-![Screenshot (397)](https://github.com/user-attachments/assets/100f3814-9827-4ea8-ba7f-6cd42b254113)
-![Screenshot (400)](https://github.com/user-attachments/assets/f8d7e58d-f1c2-4790-aae1-74c5a137e06b)
+## 🚧 Future Improvements
+- Add more Pokémon and evolution mechanics
+- Enhance animations and sound effects
+- Save/load pet progress across sessions
+- Improve mobile/touch UI support
+- Add multiplayer pet battles or trading features
 
-
-> [Originally built for a school assignment]
+  > [Originally built for a school assignment]

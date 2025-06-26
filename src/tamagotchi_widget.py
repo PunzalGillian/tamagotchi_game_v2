@@ -89,9 +89,9 @@ class TamagotchiApp(QWidget):
         self._death_exit_scheduled = False
 
     # --- Add this reusable function ---
-    def draw_centered_wrapped_text(self, painter, text, font, rect):
+    def draw_centered_wrapped_text(self, painter, text, font, rect, align="center", left_padding=10):
         """
-        Draws wrapped text centered vertically and horizontally in the given rect.
+        Draws wrapped text centered vertically and either centered or left-aligned horizontally in the given rect.
         """
         wrapped = self.wrap_text_to_box(text, font, rect.width() - 20, rect.height() - 10)
         painter.setFont(font)
@@ -101,8 +101,11 @@ class TamagotchiApp(QWidget):
         text_height = metrics.lineSpacing() * len(lines)
         y_offset = int(rect.top() + (rect.height() - text_height) // 2)
         for i, line in enumerate(lines):
-            line_width = metrics.horizontalAdvance(line)
-            x_offset = int(rect.left() + (rect.width() - line_width) // 2)
+            if align == "left":
+                x_offset = int(rect.left() + left_padding)
+            else:
+                line_width = metrics.horizontalAdvance(line)
+                x_offset = int(rect.left() + (rect.width() - line_width) // 2)
             painter.drawText(x_offset, y_offset + metrics.ascent() + i * metrics.lineSpacing(), line)
 
     def setup_ui(self):
@@ -150,11 +153,9 @@ class TamagotchiApp(QWidget):
         for key in self.screen_states:
             if self.screen_states[key]:
                 if key == "status":
-                    self.draw_centered_wrapped_text(painter, self.texts[key], font, screen)
+                    self.draw_centered_wrapped_text(painter, self.texts[key], font, screen, align="left", left_padding=16)
                 else:
-                    painter.setFont(font)
-                    painter.setPen(QPen(QColor(0, 0, 0)))
-                    painter.drawText(screen, Qt.AlignCenter, self.wrap_text_to_box(self.texts[key], font, screen_w - 24, screen_h - 12))
+                    self.draw_centered_wrapped_text(painter, self.texts[key], font, screen)
 
         if self.choosing_food:
             food = self.food_names[self.current_food_index]
