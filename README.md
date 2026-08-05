@@ -1,5 +1,5 @@
 
-# 🐾 Pokémon Tamagotchi
+# Pokémon Tamagotchi
 
 Welcome to **Pokémon Tamagotchi** — a fun, nostalgic desktop pet game where you hatch and take care of a Pokémon!  
 
@@ -11,25 +11,25 @@ Built with **Python** and using **PyQt5** for the GUI and **Pygame** for sound e
 ![PyQt5](https://img.shields.io/badge/GUI-PyQt5-green)
 ![Pygame](https://img.shields.io/badge/Sound-Pygame-red)
 
-## ✨ Features
+## Features
 
-- 🥚 **Pick an Egg**: Choose from various Pokémon eggs like Bulbasaur, Jigglypuff, Charizard, and more!
-- 🐣 **Hatch and Care**: Hatch your egg and care for your Pokémon by:
+- **Pick an Egg**: Choose from various Pokémon eggs like Bulbasaur, Jigglypuff, Charizard, and more!
+- **Hatch and Care**: Hatch your egg and care for your Pokémon by:
   - Checking its **Status**
   - Giving it **Medicine** if it's sick
   - **Feeding** it to keep it healthy
   - **Playing** with it to keep it happy
-- 🎶 **Sound Effects**: Includes hatching, attention, game start, and death sounds for an immersive experience.
-- 🎮 **Simple Controls**: Use **A**, **B**, and **C** buttons to interact and navigate the game.
-- 🎨 **Custom UI**: A nostalgic pixel art background with a draggable frameless window.
+- **Sound Effects**: Includes hatching, attention, game start, and death sounds for an immersive experience.
+- **Simple Controls**: Use **A**, **B**, and **C** buttons to interact and navigate the game.
+- **Custom UI**: A nostalgic pixel art background with a draggable frameless window.
 
-## 🛠️ Built With
+## Built With
 
 - **Python**
 - **PyQt5** — for the GUI (graphical user interface)
 - **Pygame** — for sound effects
 
-## 🚀 How to Play
+## How to Play
 
 1. **Install Dependencies**:
    ```bash
@@ -50,14 +50,14 @@ Built with **Python** and using **PyQt5** for the GUI and **Pygame** for sound e
    - Use the menu to check their **health**, **happiness**, **hunger**, and **weight**.
    - Feed and play with them to keep them healthy and happy!
 
-## 🚧 Known Issues / Future Improvements
+## Known Issues / Future Improvements
 
 - Add more Pokémon eggs for variety
 - Expand the range of actions and interactions with the Pokémon
 - Include more sound effects and animations for a more immersive experience
 - Improve mobile compatibility for a larger audience
 
-## 📷 Screenshots
+## Screenshots
 
 ![Screenshot (395)](https://github.com/user-attachments/assets/8f54434e-9f22-430a-b750-5c15ebd79ff7)
 ![Screenshot (398)](https://github.com/user-attachments/assets/64a30366-f4ec-4801-8f37-6cd5651a0c99)
